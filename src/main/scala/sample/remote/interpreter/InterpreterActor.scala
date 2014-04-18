@@ -6,8 +6,10 @@ import akka.actor.Actor
 class InterpreterActor extends Actor {
   def receive = {
     case Code(toRun) =>
-      println(s"interpreting $toRun")
-      sender ! CodeResult(s"The result was ${toRun.reverse}")
+      val rcvMessage = "Received \"" + toRun + "\"" 
+      val resMessage = "Result \""+ Repl(toRun) + "\""
+      println(rcvMessage)
+      sender ! CodeResult(s"$rcvMessage | $resMessage")
   }
 }
 

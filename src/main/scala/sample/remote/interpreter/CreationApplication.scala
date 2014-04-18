@@ -27,10 +27,14 @@ object CreationApplication {
 
     println("Started CreationSystem")
     import system.dispatcher
-    system.scheduler.schedule(1.second, 1.second) {
-      val letters = for (i <- 'a' to 'z') yield i
-      val chars = for(i <- 1 to 5) yield letters(Random.nextInt(26))
-      actor ! Code(chars.mkString)
+    val alphabet = 'a' to 'z'
+    def oneToTen = Random.nextInt(10) + 1
+    system.scheduler.schedule(1.second, 5.second) {
+      val firstPick = Random.nextInt(26)
+      val secondPick = (firstPick + 1 + Random.nextInt(25)) % 26
+      system.scheduler.scheduleOnce(1.second)(actor ! Code(s"val ${alphabet(firstPick)} = ${oneToTen}"))
+      system.scheduler.scheduleOnce(2.second)(actor ! Code(s"val ${alphabet(secondPick)} = ${oneToTen}"))
+      system.scheduler.scheduleOnce(3.second)(actor ! Code(s"${alphabet(firstPick)} + ${alphabet(secondPick)}"))
     }
 
   }
