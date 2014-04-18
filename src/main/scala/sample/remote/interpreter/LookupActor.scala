@@ -1,4 +1,4 @@
-package sample.remote.calculator
+package sample.remote.interpreter
 
 import scala.concurrent.duration._
 import akka.actor.Actor
@@ -30,13 +30,9 @@ class LookupActor(path: String) extends Actor {
   }
 
   def active(actor: ActorRef): Actor.Receive = {
-    case op: MathOp => actor ! op
-    case result: MathResult => result match {
-      case AddResult(n1, n2, r) =>
-        printf("Add result: %d + %d = %d\n", n1, n2, r)
-      case SubtractResult(n1, n2, r) =>
-        printf("Sub result: %d - %d = %d\n", n1, n2, r)
-    }
+    case op: Code => actor ! op
+    case CodeResult(result) => 
+      println(result)
     case Terminated(`actor`) =>
       println("Calculator terminated")
       sendIdentifyRequest()

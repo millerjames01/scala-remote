@@ -1,4 +1,4 @@
-package sample.remote.calculator
+package sample.remote.interpreter
 
 import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
@@ -8,15 +8,15 @@ import akka.actor.Props
 
 object CreationApplication {
   def main(args: Array[String]): Unit = {
-    if (args.isEmpty || args.head == "CalculatorWorker")
+    if (args.isEmpty || args.head == "InterpreterWorkerSystem")
       startRemoteWorkerSystem()
     if (args.isEmpty || args.head == "Creation")
       startRemoteCreationSystem()
   }
 
   def startRemoteWorkerSystem(): Unit = {
-    ActorSystem("CalculatorWorkerSystem", ConfigFactory.load("calculator"))
-    println("Started CalculatorWorkerSystem")
+    ActorSystem("InterpreterWorkerSystem", ConfigFactory.load("interpreter"))
+    println("Started InterpreterWorkerSystem")
   }
 
   def startRemoteCreationSystem(): Unit = {
@@ -28,10 +28,9 @@ object CreationApplication {
     println("Started CreationSystem")
     import system.dispatcher
     system.scheduler.schedule(1.second, 1.second) {
-      if (Random.nextInt(100) % 2 == 0)
-        actor ! Multiply(Random.nextInt(20), Random.nextInt(20))
-      else
-        actor ! Divide(Random.nextInt(10000), (Random.nextInt(99) + 1))
+      val letters = for (i <- 'a' to 'z') yield i
+      val chars = for(i <- 1 to 5) yield letters(Random.nextInt(26))
+      actor ! Code(chars.mkString)
     }
 
   }

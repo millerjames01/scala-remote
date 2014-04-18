@@ -1,4 +1,4 @@
-package sample.remote.calculator
+package sample.remote.interpreter
 
 import scala.concurrent.duration._
 import scala.util.Random
@@ -15,11 +15,11 @@ object LookupApplication {
   }
 
   def startRemoteCalculatorSystem(): Unit = {
-    val system = ActorSystem("CalculatorSystem",
-      ConfigFactory.load("calculator"))
-    system.actorOf(Props[CalculatorActor], "calculator")
+    val system = ActorSystem("InterpreterSystem",
+      ConfigFactory.load("interpreter"))
+    system.actorOf(Props[InterpreterActor], "interpreter")
 
-    println("Started CalculatorSystem - waiting for messages")
+    println("Started InterpreterSystem - waiting for messages")
   }
 
   def startRemoteLookupSystem(): Unit = {
@@ -29,13 +29,12 @@ object LookupApplication {
       "akka.tcp://CalculatorSystem@127.0.0.1:2552/user/calculator"
     val actor = system.actorOf(Props(classOf[LookupActor], remotePath), "lookupActor")
 
-    println("Started LookupSystem")
+    println("Started LookupSystem") 
     import system.dispatcher
     system.scheduler.schedule(1.second, 1.second) {
-      if (Random.nextInt(100) % 2 == 0)
-        actor ! Add(Random.nextInt(100), Random.nextInt(100))
-      else
-        actor ! Subtract(Random.nextInt(100), Random.nextInt(100))
+      val letters = for (i <- 'a' to 'z') yield i
+      val chars = for(i <- 1 to 5) yield letters(Random.nextInt(26))
+      actor ! Code(chars.mkString)
     }
   }
 }
