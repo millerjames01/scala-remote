@@ -8,9 +8,9 @@ import akka.actor.Props
 
 object CreationApplication {
   def main(args: Array[String]): Unit = {
-    if (args.isEmpty || args.head == "InterpreterWorkerSystem")
+    if (args.isEmpty)
       startRemoteWorkerSystem()
-    if (args.isEmpty || args.head == "Creation")
+    if (args.head == "Creation")
       startRemoteCreationSystem()
   }
 
@@ -27,15 +27,19 @@ object CreationApplication {
 
     println("Started CreationSystem")
     import system.dispatcher
+    import CreationActor._
     val alphabet = 'a' to 'z'
     def oneToTen = Random.nextInt(10) + 1
-    system.scheduler.schedule(1.second, 5.second) {
+    system.scheduler.schedule(20.second, 5.second) {
       val firstPick = Random.nextInt(26)
       val secondPick = (firstPick + 1 + Random.nextInt(25)) % 26
       system.scheduler.scheduleOnce(1.second)(actor ! Code(s"val ${alphabet(firstPick)} = ${oneToTen}"))
       system.scheduler.scheduleOnce(2.second)(actor ! Code(s"val ${alphabet(secondPick)} = ${oneToTen}"))
       system.scheduler.scheduleOnce(3.second)(actor ! Code(s"${alphabet(firstPick)} + ${alphabet(secondPick)}"))
     }
-
+    actor ! StartSystem
+    system.scheduler.scheduleOnce(10.seconds){
+      actor ! EndSystem
+    }
   }
 }
