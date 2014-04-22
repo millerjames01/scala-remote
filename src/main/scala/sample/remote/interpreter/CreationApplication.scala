@@ -10,7 +10,7 @@ object CreationApplication {
   def main(args: Array[String]): Unit = {
     if (args.isEmpty)
       startRemoteWorkerSystem()
-    if (args.head == "Creation")
+    if (!args.isEmpty && args.head == "Creation")
       startRemoteCreationSystem()
   }
 
@@ -29,16 +29,16 @@ object CreationApplication {
     import system.dispatcher
     import CreationActor._
     val alphabet = 'a' to 'z'
-    def oneToTen = Random.nextInt(10) + 1
+    def oneToTen = Random.nextInt(10) + 1/*
     system.scheduler.schedule(20.second, 5.second) {
       val firstPick = Random.nextInt(26)
       val secondPick = (firstPick + 1 + Random.nextInt(25)) % 26
       system.scheduler.scheduleOnce(1.second)(actor ! Code(s"val ${alphabet(firstPick)} = ${oneToTen}"))
       system.scheduler.scheduleOnce(2.second)(actor ! Code(s"val ${alphabet(secondPick)} = ${oneToTen}"))
       system.scheduler.scheduleOnce(3.second)(actor ! Code(s"${alphabet(firstPick)} + ${alphabet(secondPick)}"))
-    }
+    }*/
     actor ! StartSystem
-    system.scheduler.scheduleOnce(10.seconds){
+    system.scheduler.scheduleOnce(30.seconds){
       actor ! EndSystem
     }
   }
